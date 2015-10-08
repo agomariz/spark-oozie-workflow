@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property>
+      <name>nameNode</name>
+      <value>hdfs://${master}:8020</value>
+    </property>
+
+    <property>
+      <name>jobTracker</name>
+      <value>${master}:8032</value>
+    </property>
+
+    <property>
+      <name>appName</name>
+      <value>spark-oozie-workflow</value>
+    </property>
+
+    <property>
+      <name>oozie.coord.application.path</name>
+      <value>${nameNode}/jobs/${appName}</value>
+    </property>
+
+    <property>
+      <name>jobHomeDir</name>
+      <value>hdfs:///jobs/${appName}</value>
+    </property>
+
+    <property>
+      <name>queueName</name>
+      <value>automation</value>
+    </property>
+
+    <property>
+      <name>start</name>
+      <value>2015-10-07T00:30Z</value>
+    </property>
+
+    <property>
+      <name>end</name>
+      <value>2050-01-01T01:00Z</value>
+    </property>
+
+    <property>
+      <name>oozie.wf.rerun.failnodes</name>
+      <value>false</value>
+    </property>
+    
+    <property>
+      <name>oozie.use.system.libpath</name>
+      <value>true</value>
+    </property>
+
+    <property>
+      <name>retries</name>
+      <value>3</value>
+    </property>
+
+    <property>
+      <name>retryinterval</name>
+      <value>1</value>
+    </property>
+
+    <property>
+      <name>userName</name>
+      <value>${user.name}</value>
+    </property>
+    
+    <property>
+      <name>notificationEmail</name>
+      <value>bartek.dobija@gmail.com</value>
+    </property>
+
+</configuration>

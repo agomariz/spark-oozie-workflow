@@ -1,0 +1,51 @@
+<coordinator-app name="${appName}-coordinator" frequency="${coord:days(1)}" start="${start}" end="${end}" timezone="UTC" xmlns="uri:oozie:coordinator:0.1">
+
+  <controls>
+    <timeout>10</timeout>
+    <concurrency>1</concurrency>
+  </controls>
+  
+  <datasets>
+    <dataset name="statusflag" frequency="${coord:days(1)}" initial-instance="${start}" timezone="UTC">
+      <uri-template>
+        ${nameNode}/status/${appName}/${YEAR}/${MONTH}/${DAY}-${HOUR}-${MINUTE}/success
+      </uri-template>
+      <done-flag></done-flag>
+    </dataset>
+  </datasets>
+
+  <output-events>
+    <data-out name="statusflag" dataset="statusflag">
+      <instance>${coord:current(0)}</instance>
+    </data-out>
+  </output-events>
+
+  <action>
+    <workflow>
+      <app-path>${nameNode}/jobs/${appName}</app-path>
+      <configuration>
+        <property>
+          <name>fromTime</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, 'DAY'), "yyyy-MM-dd 00:00:00")}</value>
+        </property>
+        <property>
+          <name>slaTime</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), 0, 'DAY'), "yyyy-MM-dd'T'HH:mm'Z'")}</value>
+        </property>
+        <property>
+          <name>dataImportTime</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), 0, 'DAY'), "yyyy-MM-dd HH:mm:ss")}</value>
+        </property>
+        <property>
+          <name>dataImportTimePath</name>
+          <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), 0, 'DAY'), "yyyyMMddHHmmss")}</value>
+        </property>
+        <property>
+          <name>statusflag</name>
+          <value>${coord:dataOut('statusflag')}</value>
+        </property>
+      </configuration>
+    </workflow>
+  </action>
+
+ </coordinator-app>

@@ -1,0 +1,70 @@
+<workflow-app name="${appName}" xmlns="uri:oozie:workflow:0.5" xmlns:sla="uri:oozie:sla:0.2">
+
+  <global>
+    <job-tracker>${jobTracker}</job-tracker>
+    <name-node>${nameNode}</name-node>
+    <configuration>
+      <property>
+        <name>mapred.job.queue.name</name>
+        <value>${queueName}</value>
+      </property>
+      <property>
+        <name>mapred.compress.map.output</name>
+        <value>true</value>
+      </property>
+    </configuration>
+  </global>
+  
+  <start to="spark-action" />
+  
+  <action name="spark-action">
+    <shell xmlns="uri:oozie:shell-action:0.3">
+      <exec>sbin/spark.sh</exec>
+      <argument>${jobHomeDir}/lib/${appName}-1.0.0.jar</argument>
+      <argument>com.github.bartekdobija.spark.core.Main</argument>
+      <argument>${keytabLocation}</argument>
+      <argument>${principal}</argument>
+      <file>sbin/spark.sh</file>
+    </shell>
+    <ok to="create-status-flag"/>
+    <error to="error-notification-email"/>
+  </action>
+
+  <action name="create-status-flag">
+    <fs>
+      <mkdir path="${statusflag}"/>
+    </fs>
+    <ok to="end" />
+    <error to="error-notification-email" />
+  </action>
+
+  <action name="error-notification-email">
+    <email xmlns="uri:oozie:email-action:0.1">
+      <to>${notificationEmail}</to>
+      <subject>Email notifications for ${wf:id()}</subject>
+      <body>
+      The workflow has failed:
+      Time:  ${timestamp()}
+      Name:  ${wf:name()}
+      ID:    ${wf:id()}
+      Error: ${wf:lastErrorNode()}
+      </body>
+    </email>
+    <ok to="kill"/>
+    <error to="kill"/>
+  </action>
+
+  <kill name="kill"><message>Job failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message></kill>
+  <end name="end" />
+
+  <sla:info>
+    <sla:nominal-time>${slaTime}</sla:nominal-time>
+    <sla:should-start>${5 * MINUTES}</sla:should-start>
+    <sla:should-end>${4 * HOURS}</sla:should-end>
+    <sla:max-duration>${4 * HOURS}</sla:max-duration>
+    <sla:alert-contact>${notificationEmail}</sla:alert-contact>
+    <sla:notification-msg>${slaTime}: CHECK RAW ODS IMPORT WORKFLOW</sla:notification-msg>
+    <sla:upstream-apps />
+  </sla:info>
+
+</workflow-app>

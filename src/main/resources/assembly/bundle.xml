@@ -1,0 +1,22 @@
+<assembly>
+  <id>bundle</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>target/classes/workflow</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>./**</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>target</directory>
+      <outputDirectory>lib</outputDirectory>
+      <includes>
+        <include>./${project.artifactId}*.jar</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
